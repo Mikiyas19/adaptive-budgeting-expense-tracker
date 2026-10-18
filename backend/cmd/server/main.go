@@ -21,6 +21,8 @@ func main() {
 	authHandler := handlers.NewAuthHandler(db)
 	expenseHandler := handlers.NewExpenseHandler(db)
 	debtHandler := handlers.NewDebtHandler(db)
+	categoryHandler := handlers.NewCategoryHandler(db)
+	syncHandler := handlers.NewSyncHandler(db)
 
 	v1 := r.Group("/api/v1")
 	{
@@ -41,6 +43,14 @@ func main() {
 		v1.POST("/debts", debtHandler.AddDebt)
 		v1.GET("/debts", debtHandler.GetDebts)
 		v1.PATCH("/debts/:id/settle", debtHandler.SettleDebt)
+
+		// Category routes
+		v1.POST("/categories", categoryHandler.CreateCategory)
+		v1.GET("/categories", categoryHandler.GetCategories)
+
+		// Synchronization routes
+		v1.GET("/sync/status", syncHandler.GetSyncStatus)
+		v1.POST("/sync/upload", syncHandler.UploadSync)
 	}
 
 	log.Println("Server starting on port 8080...")
