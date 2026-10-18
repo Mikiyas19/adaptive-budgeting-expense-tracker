@@ -1,16 +1,18 @@
--- 1. Users Table
-CREATE TABLE users (
+-- 1. Users Table (including password reset columns)
+CREATE TABLE IF NOT EXISTS users (
     user_id SERIAL PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     full_name VARCHAR(100),
     monthly_budget DECIMAL(10, 2) DEFAULT 0.00,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_sync_timestamp TIMESTAMP
+    last_sync_timestamp TIMESTAMP,
+    reset_token VARCHAR(255),
+    reset_expires TIMESTAMP
 );
 
 -- 2. Categories Table (with is_fixed flag for fixed vs discretionary rules)
-CREATE TABLE categories (
+CREATE TABLE IF NOT EXISTS categories (
     category_id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(user_id) ON DELETE CASCADE, -- NULL for predefined categories
     name VARCHAR(30) NOT NULL,
@@ -20,7 +22,7 @@ CREATE TABLE categories (
 );
 
 -- 3. Expenses Table (with sync tracking for offline-first operation)
-CREATE TABLE expenses (
+CREATE TABLE IF NOT EXISTS expenses (
     expense_id SERIAL PRIMARY KEY,
     user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     category_id INT NOT NULL REFERENCES categories(category_id),
@@ -32,7 +34,7 @@ CREATE TABLE expenses (
 );
 
 -- 4. Debts Table (for informal peer-to-peer lending)
-CREATE TABLE debts (
+CREATE TABLE IF NOT EXISTS debts (
     debt_id SERIAL PRIMARY KEY,
     user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     counterparty_name VARCHAR(100) NOT NULL,
@@ -46,7 +48,7 @@ CREATE TABLE debts (
 );
 
 -- 5. Reminders Table
-CREATE TABLE reminders (
+CREATE TABLE IF NOT EXISTS reminders (
     reminder_id SERIAL PRIMARY KEY,
     user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     expense_id INT REFERENCES expenses(expense_id) ON DELETE SET NULL,
@@ -59,7 +61,7 @@ CREATE TABLE reminders (
 );
 
 -- 6. SyncLog Table (tracks synchronization audit history)
-CREATE TABLE sync_logs (
+CREATE TABLE IF NOT EXISTS sync_logs (
     sync_id SERIAL PRIMARY KEY,
     user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     last_sync_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -69,6 +71,6 @@ CREATE TABLE sync_logs (
 );
 
 -- Performance Indexes (to support rapid statistical aggregations and queries)
-CREATE INDEX idx_expenses_user_date ON expenses(user_id, expense_date);
-CREATE INDEX idx_expenses_category ON expenses(category_id);
-CREATE INDEX idx_debts_user_status ON debts(user_id, status, due_date);
+CREATE INDEX IF NOT EXISTS idx_expenses_user_date ON expenses(user_id, expense_date);
+CREATE INDEX IF NOT EXISTS idx_expenses_category ON expenses(category_id);
+CREATE INDEX IF NOT EXISTS idx_debts_user_status ON debts(user_id, status, due_date);

@@ -33,6 +33,8 @@ func main() {
 		// Auth routes
 		v1.POST("/register", authHandler.Register)
 		v1.POST("/login", authHandler.Login)
+		v1.POST("/forgot-password", authHandler.ForgotPassword)
+		v1.POST("/reset-password", authHandler.ResetPassword)
 
 		// Expense routes
 		v1.POST("/expenses", expenseHandler.AddExpense)
@@ -51,6 +53,7 @@ func main() {
 		// Synchronization routes
 		v1.GET("/sync/status", syncHandler.GetSyncStatus)
 		v1.POST("/sync/upload", syncHandler.UploadSync)
+		v1.GET("/sync/download", syncHandler.DownloadSync)
 	}
 
 	log.Println("Server starting on port 8080...")
