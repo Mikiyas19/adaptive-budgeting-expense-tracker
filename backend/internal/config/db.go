@@ -14,7 +14,8 @@ func ConnectDB() (*sql.DB, error) {
 	// Format: postgres://username:password@localhost:5432/dbname?sslmode=disable
 	connStr := os.Getenv("DATABASE_URL")
 	if connStr == "" {
-		connStr = "postgres://postgres:postgres@localhost:5432/adaptive_budgeting?sslmode=disable"
+		// Secure fallback with a placeholder instead of hardcoding sensitive credentials
+		connStr = "postgres://postgres:your_password_here@localhost:5432/adaptive_budgeting?sslmode=disable"
 	}
 
 	db, err := sql.Open("postgres", connStr)

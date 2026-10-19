@@ -7,9 +7,15 @@ import (
 	"github.com/Mikiyas19/adaptive-budgeting-expense-tracker/backend/internal/config"
 	"github.com/Mikiyas19/adaptive-budgeting-expense-tracker/backend/internal/handlers"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Load the .env file if present for local development
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found, relying on system environment variables")
+	}
+
 	db, err := config.ConnectDB()
 	if err != nil {
 		log.Fatalf("Database connection failed: %v", err)
